@@ -1,13 +1,6 @@
-/**
- * @type {Options}
- */
-export default {
+module.exports = {
   tabWidth: 2,
   semi: false,
   singleQuote: true,
   trailingComma: 'none'
 }
-
-/**
- * @import { Options } from 'prettier'
- */

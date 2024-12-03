@@ -1,64 +1,17 @@
 # btms-ui-tests
 
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_btms-ui-tests&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=DEFRA_btms-ui-tests)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_btms-ui-tests&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_btms-ui-tests)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_btms-ui-tests&metric=coverage)](https://sonarcloud.io/summary/new_code?id=DEFRA_btms-ui-tests)
-
-Core delivery platform Node.js Frontend Template.
+The template to create a service that runs WDIO tests against an environment.
 
 - [Requirements](#requirements)
   - [Node.js](#nodejs)
-- [Server-side Caching](#server-side-caching)
-- [Redis](#redis)
-- [Local Development](#local-development)
+- [Local](#local)
   - [Setup](#setup)
-  - [Development](#development)
-  - [Production](#production)
-  - [Npm scripts](#npm-scripts)
-  - [Update dependencies](#update-dependencies)
-  - [Formatting](#formatting)
-    - [Windows prettier issue](#windows-prettier-issue)
-- [Docker](#docker)
-  - [Development image](#development-image)
-  - [Production image](#production-image)
-  - [Docker Compose](#docker-compose)
-  - [Dependabot](#dependabot)
-  - [SonarCloud](#sonarcloud)
+  - [Running local tests](#running-local-tests)
+  - [Debugging local tests](#debugging-local-tests)
+- [Production](#production)
+  - [Debugging tests](#debugging-tests)
 - [Licence](#licence)
   - [About the licence](#about-the-licence)
-
-## Requirements
-
-### Node.js
-
-Please install [Node.js](http://nodejs.org/) `>= v18` and [npm](https://nodejs.org/) `>= v9`. You will find it
-easier to use the Node Version Manager [nvm](https://github.com/creationix/nvm)
-
-To use the correct version of Node.js for this application, via nvm:
-
-```bash
-cd btms-ui-tests
-nvm use
-```
-
-## Server-side Caching
-
-We use Catbox for server-side caching. By default the service will use CatboxRedis when deployed and CatboxMemory for
-local development.
-You can override the default behaviour by setting the `SESSION_CACHE_ENGINE` environment variable to either `redis` or
-`memory`.
-
-Please note: CatboxMemory (`memory`) is _not_ suitable for production use! The cache will not be shared between each
-instance of the service and it will not persist between restarts.
-
-## Redis
-
-Redis is an in-memory key-value store. Every instance of a service has access to the same Redis key-value store similar
-to how services might have a database (or MongoDB). All frontend services are given access to a namespaced prefixed that
-matches the service name. e.g. `my-service` will have access to everything in Redis that is prefixed with `my-service`.
-
-If your service does not require a session cache to be shared between instances or if you don't require Redis, you can
-disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `~/src/config/index.js`.
 
 ## Local Development
 
@@ -70,104 +23,36 @@ Install application dependencies:
 npm install
 ```
 
-### Development
+### Running local tests
 
-To run the application in `development` mode run:
-
-```bash
-npm run dev
-```
-
-### Production
-
-To mimic the application running in `production` mode locally run:
+Start application you are testing on the url specified in `baseUrl` [wdio.local.conf.js](wdio.local.conf.js)
 
 ```bash
-npm start
+npm run test:local
 ```
 
-### Npm scripts
-
-All available Npm scripts can be seen in [package.json](./package.json)
-To view them in your command line run:
+### Debugging local tests
 
 ```bash
-npm run
+npm run test:local:debug
 ```
 
-### Update dependencies
+## Production
 
-To update dependencies use [npm-check-updates](https://github.com/raineorshine/npm-check-updates):
+### Running the tests
 
-> The following script is a good start. Check out all the options on
-> the [npm-check-updates](https://github.com/raineorshine/npm-check-updates)
+Tests are run from the CDP-Portal under the Test Suites section. Before any changes can be run, a new docker image must be built, this will happen automatically when a pull request is merged into the `main` branch.
+You can check the progress of the build under the actions section of this repository. Builds typically take around 1-2 minutes.
 
-```bash
-ncu --interactive --format group
-```
+The results of the test run are made available in the portal.
 
-### Formatting
+## Requirements of CDP Environment Tests
 
-#### Windows prettier issue
+1. Your service builds as a docker container using the `.github/workflows/publish.yml`
+   The workflow tags the docker images allowing the CDP Portal to identify how the container should be run on the platform.
+   It also ensures its published to the correct docker repository.
 
-If you are having issues with formatting of line breaks on Windows update your global git config by running:
-
-```bash
-git config --global core.autocrlf false
-```
-
-## Docker
-
-### Development image
-
-Build:
-
-```bash
-docker build --target development --no-cache --tag btms-ui-tests:development .
-```
-
-Run:
-
-```bash
-docker run -p 3000:3000 btms-ui-tests:development
-```
-
-### Production image
-
-Build:
-
-```bash
-docker build --no-cache --tag btms-ui-tests .
-```
-
-Run:
-
-```bash
-docker run -p 3000:3000 btms-ui-tests
-```
-
-### Docker Compose
-
-A local environment with:
-
-- Localstack for AWS services (S3, SQS)
-- Redis
-- MongoDB
-- This service.
-- A commented out backend example.
-
-```bash
-docker compose up --build -d
-```
-
-### Dependabot
-
-We have added an example dependabot configuration file to the repository. You can enable it by renaming
-the [.github/example.dependabot.yml](.github/example.dependabot.yml) to `.github/dependabot.yml`
-
-### SonarCloud
-
-Instructions for setting up SonarCloud can be found in [sonar-project.properties](./sonar-project.properties).
+2. The Dockerfile's entrypoint script should return exit
 
 ## Licence
 
@@ -177,7 +62,7 @@ THIS INFORMATION IS LICENSED UNDER THE CONDITIONS OF THE OPEN GOVERNMENT LICENCE
 
 The following attribution statement MUST be cited in your products and applications when using this information.
 
-> Contains public sector information licensed under the Open Government license v3
+> Contains public sector information licensed under the Open Government licence v3
 
 ### About the licence
 
